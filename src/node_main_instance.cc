@@ -106,6 +106,12 @@ NodeMainInstance::~NodeMainInstance() {
   isolate_->Dispose();
 }
 
+/**
+ * @brief coderzhu:
+ * key function call:CreateMainEnvironment,LoadEnvironment
+ * 
+ * @return int 
+ */
 int NodeMainInstance::Run() {
   Locker locker(isolate_);
   Isolate::Scope isolate_scope(isolate_);
@@ -176,6 +182,13 @@ int NodeMainInstance::Run() {
   return exit_code;
 }
 
+/**
+ * @brief coderzhu:
+ * key function call: NewContext CreateEnvironment
+ * 
+ * @param exit_code 
+ * @return DeleteFnPtr<Environment, FreeEnvironment> 
+ */
 DeleteFnPtr<Environment, FreeEnvironment>
 NodeMainInstance::CreateMainEnvironment(int* exit_code) {
   *exit_code = 0;  // Reset the exit code to 0

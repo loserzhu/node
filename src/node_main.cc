@@ -108,6 +108,13 @@ extern bool linux_at_secure;
 }  // namespace per_process
 }  // namespace node
 
+/**
+ * @brief coderzhu: entry
+ * 
+ * @param argc 
+ * @param argv 
+ * @return int 
+ */
 int main(int argc, char* argv[]) {
 #if defined(__POSIX__) && defined(NODE_SHARED_MODE)
   // In node::PlatformInit(), we squash all signal handlers for non-shared lib

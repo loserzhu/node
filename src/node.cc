@@ -287,6 +287,13 @@ void Environment::InitializeDiagnostics() {
 #endif
 }
 
+/**
+ * @brief coderzhu:
+ * 这里通过执行js层 bootstrap/loaders,获得了 require internalBinding两个重要函数
+ * require就是我们常用的，internalBinding 获取native module
+ * 
+ * @return MaybeLocal<Value> 
+ */
 MaybeLocal<Value> Environment::BootstrapInternalLoaders() {
   EscapableHandleScope scope(isolate_);
 
@@ -328,6 +335,12 @@ MaybeLocal<Value> Environment::BootstrapInternalLoaders() {
   return scope.Escape(loader_exports);
 }
 
+/**
+ * @brief coderzhu:
+ * 这里就在使用BootstrapInternalLoaders获得的函数，开始给global对象挂载一系列方法
+ * 
+ * @return MaybeLocal<Value> 
+ */
 MaybeLocal<Value> Environment::BootstrapNode() {
   EscapableHandleScope scope(isolate_);
 
@@ -386,6 +399,12 @@ MaybeLocal<Value> Environment::BootstrapNode() {
   return scope.EscapeMaybe(result);
 }
 
+/**
+ * @brief coderzhu:
+ * key function call: BootstrapInternalLoaders, BootstrapNode
+ * 
+ * @return MaybeLocal<Value> 
+ */
 MaybeLocal<Value> Environment::RunBootstrapping() {
   EscapableHandleScope scope(isolate_);
 
@@ -443,6 +462,14 @@ MaybeLocal<Value> StartExecution(Environment* env, const char* main_script_id) {
       ExecuteBootstrapper(env, main_script_id, &parameters, &arguments));
 }
 
+/**
+ * @brief coderzhu:
+ * 可能，从这里执行js文件
+ * 
+ * @param env 
+ * @param cb 
+ * @return MaybeLocal<Value> 
+ */
 MaybeLocal<Value> StartExecution(Environment* env, StartExecutionCallback cb) {
   InternalCallbackScope callback_scope(
       env,
@@ -502,6 +529,11 @@ MaybeLocal<Value> StartExecution(Environment* env, StartExecutionCallback cb) {
     return StartExecution(env, "internal/main/check_syntax");
   }
 
+/**
+ * @brief coderzhu:
+ * start here? index.js 
+ * 
+ */
   if (!first_argv.empty() && first_argv != "-") {
     return StartExecution(env, "internal/main/run_main_module");
   }
@@ -829,6 +861,14 @@ int ProcessGlobalArgs(std::vector<std::string>* args,
 
 static std::atomic_bool init_called{false};
 
+/**
+ * @brief coderzhu:
+ * key function call: binding::RegisterBuiltinModules
+ * @param argv 
+ * @param exec_argv 
+ * @param errors 
+ * @return int 
+ */
 int InitializeNodeWithArgs(std::vector<std::string>* argv,
                            std::vector<std::string>* exec_argv,
                            std::vector<std::string>* errors) {
@@ -975,6 +1015,14 @@ void Init(int* argc,
     argv[i] = strdup(argv_[i].c_str());
 }
 
+/**
+ * @brief coderzhu:
+ * key function call:InitializeNodeWithArgs,V8::Initialize()
+ * 
+ * @param argc 
+ * @param argv 
+ * @return InitializationResult 
+ */
 InitializationResult InitializeOncePerProcess(int argc, char** argv) {
   // Initialized the enabled list for Debug() calls with system
   // environment variables.
@@ -1071,6 +1119,13 @@ void TearDownOncePerProcess() {
   per_process::v8_platform.Dispose();
 }
 
+/**
+ * @brief coderzhu: start node
+ * key function call: InitializeOncePerProcess, Run
+ * @param argc 
+ * @param argv 
+ * @return int 
+ */
 int Start(int argc, char** argv) {
   InitializationResult result = InitializeOncePerProcess(argc, argv);
   if (result.early_return) {

@@ -338,6 +338,19 @@ Environment* CreateEnvironment(IsolateData* isolate_data,
       std::vector<std::string>(exec_argv, exec_argv + exec_argc));
 }
 
+/**
+ * @brief coderzhu:Create a Environment object
+ * key function call: RunBootstrapping
+ * 
+ * @param isolate_data 
+ * @param context 
+ * @param args 
+ * @param exec_args 
+ * @param flags 
+ * @param thread_id 
+ * @param inspector_parent_handle 
+ * @return Environment* 
+ */
 Environment* CreateEnvironment(
     IsolateData* isolate_data,
     Local<Context> context,
@@ -412,12 +425,27 @@ NODE_EXTERN std::unique_ptr<InspectorParentHandle> GetInspectorParentHandle(
 #endif
 }
 
+/**
+ * @brief coderzhu:
+ * 多个重载，那么问题来了，到底执行了哪些重载
+ * 
+ * @param env 
+ */
 void LoadEnvironment(Environment* env) {
   USE(LoadEnvironment(env,
                       StartExecutionCallback{},
                       {}));
 }
 
+/**
+ * @brief codderzhu:
+ * key function call: InitializeLibuv, StartExecution
+ * 
+ * @param env 
+ * @param cb 
+ * @param removeme 
+ * @return MaybeLocal<Value> 
+ */
 MaybeLocal<Value> LoadEnvironment(
     Environment* env,
     StartExecutionCallback cb,

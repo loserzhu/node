@@ -290,7 +290,9 @@ void Environment::InitializeDiagnostics() {
 /**
  * @brief coderzhu:
  * 这里通过执行js层 bootstrap/loaders,获得了 require internalBinding两个重要函数
- * require就是我们常用的，internalBinding 获取native module
+ * NOTICE: require是用来获取native_module的,跟在user script中require不同.
+ * user script require函数是在js中定义的,其实是 internal/modules/cjs/loaders  Module.prototype.require(call _compile)
+ * internalBinding 获取native module
  * 
  * @return MaybeLocal<Value> 
  */

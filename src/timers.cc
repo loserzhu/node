@@ -18,7 +18,11 @@ void SetupTimers(const FunctionCallbackInfo<Value>& args) {
   CHECK(args[0]->IsFunction());
   CHECK(args[1]->IsFunction());
   auto env = Environment::GetCurrent(args);
-
+  /**
+   * @brief coderzhu:
+   * 保存JavaScript中设置的处理immediate和timeout的函数
+   * 
+   */
   env->set_immediate_callback_function(args[0].As<Function>());
   env->set_timers_callback_function(args[1].As<Function>());
 }

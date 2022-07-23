@@ -835,6 +835,11 @@ void Environment::RunTimers(uv_timer_t* handle) {
   Local<Object> process = env->process_object();
   InternalCallbackScope scope(env, process, {0, 0});
 
+  /**
+   * @brief coderzhu:
+   * 在js中设置的函数 processTimers
+   * 
+   */
   Local<Function> cb = env->timers_callback_function();
   MaybeLocal<Value> ret;
   Local<Value> arg = env->GetNow();
@@ -844,6 +849,7 @@ void Environment::RunTimers(uv_timer_t* handle) {
   do {
     TryCatchScope try_catch(env);
     try_catch.SetVerbose(true);
+    // coderzhu: 执行js回调processTimers函数, 接收 libuv_now
     ret = cb->Call(env->context(), process, 1, &arg);
   } while (ret.IsEmpty() && env->can_call_into_js());
 
@@ -868,11 +874,15 @@ void Environment::RunTimers(uv_timer_t* handle) {
   uv_handle_t* h = reinterpret_cast<uv_handle_t*>(handle);
 
   if (expiry_ms != 0) {
+    // coderzhu: 算出下次超时的相对值 
     int64_t duration_ms =
         llabs(expiry_ms) - (uv_now(env->event_loop()) - env->timer_base());
 
+    // coderzhu: 重新把handle插入Libuv的二叉堆 
     env->ScheduleTimer(duration_ms > 0 ? duration_ms : 1);
 
+    // 大于0说明还有节点没超时，并且不允许事件循环退出,需要保持定时器的激活状态（如果之前是激活状态则不影响）
+    // 小于0说明定时器不影响Libuv的事件循环的结束，改成非激活状态
     if (expiry_ms > 0)
       uv_ref(h);
     else

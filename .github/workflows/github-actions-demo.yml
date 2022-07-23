@@ -15,13 +15,13 @@ jobs:
         run: |
           ls -al ${{ github.workspace }}
       - run: echo "🍏 This job's status is ${{ job.status }}."
-      - name: Try build node(debug version) on github...
-        run: |
-          ./configure --debug
-          make -j4
-      - name: node debug artifacts...
-        uses: actions/upload-artifact@v3
-        with:
-          name: node_debug
-          path: out/Debug/node
+      # - name: Try build node(debug version) on github...
+      #   run: |
+      #     ./configure --debug
+      #     make -j4
+      # - name: node debug artifacts...
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: node_debug
+      #     path: out/Debug/node
       

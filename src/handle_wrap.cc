@@ -60,6 +60,7 @@ void HandleWrap::HasRef(const FunctionCallbackInfo<Value>& args) {
 }
 
 
+// coderzhu: 关闭handle（JS层调用），成功后执行回调
 void HandleWrap::Close(const FunctionCallbackInfo<Value>& args) {
   HandleWrap* wrap;
   ASSIGN_OR_RETURN_UNWRAP(&wrap, args.Holder());
@@ -67,6 +68,7 @@ void HandleWrap::Close(const FunctionCallbackInfo<Value>& args) {
   wrap->Close(args[0]);
 }
 
+//coderzhu: 真正关闭handle的函数
 void HandleWrap::Close(Local<Value> close_callback) {
   if (state_ != kInitialized)
     return;
@@ -115,7 +117,17 @@ void HandleWrap::MarkAsUninitialized() {
   state_ = kClosed;
 }
 
-
+/**
+ * @brief Construct a new Handle Wrap:: Handle Wrap object
+ * coderzhu: 
+ * object为C++层为JS层提供的对象,
+ * handle为子类具体的handle类型，不同模块不一样
+ * 
+ * @param env 
+ * @param object 
+ * @param handle 
+ * @param provider 
+ */
 HandleWrap::HandleWrap(Environment* env,
                        Local<Object> object,
                        uv_handle_t* handle,
@@ -123,9 +135,11 @@ HandleWrap::HandleWrap(Environment* env,
     : AsyncWrap(env, object, provider),
       state_(kInitialized),
       handle_(handle) {
+  // coderzhu: 保存Libuv handle和C++对象的关系
   handle_->data = this;
   HandleScope scope(env->isolate());
   CHECK(env->has_run_bootstrapping_code());
+  // coderzhu: 插入handle队列 
   env->handle_wrap_queue()->PushBack(this);
 }
 

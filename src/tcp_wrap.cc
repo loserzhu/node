@@ -144,6 +144,13 @@ void TCPWrap::New(const FunctionCallbackInfo<Value>& args) {
       UNREACHABLE();
   }
 
+    /**
+     * @brief coderzhu:
+     * args.This()为v8提供的一个C++对象（由Initialize函数定义的模块创建的）
+     * 调用该C++对象的SetAlignedPointerInInternalField(0,this)关联this（new TCPWrap()）
+     * 见HandleWrap
+     * 
+     */
   new TCPWrap(env, args.This(), provider);
 }
 

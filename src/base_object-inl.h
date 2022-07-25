@@ -43,6 +43,7 @@ BaseObject::BaseObject(Environment* env, v8::Local<v8::Object> object)
     : persistent_handle_(env->isolate(), object), env_(env) {
   CHECK_EQ(false, object.IsEmpty());
   CHECK_GT(object->InternalFieldCount(), 0);
+  // coderzhu: 把this存到object中
   object->SetAlignedPointerInInternalField(
       BaseObject::kSlot,
       static_cast<void*>(this));
@@ -100,6 +101,7 @@ Environment* BaseObject::env() const {
   return env_;
 }
 
+// coderzhu: 通过obj取出里面保存的BaseObject对象
 BaseObject* BaseObject::FromJSObject(v8::Local<v8::Value> value) {
   v8::Local<v8::Object> obj = value.As<v8::Object>();
   DCHECK_GE(obj->InternalFieldCount(), BaseObject::kSlot);

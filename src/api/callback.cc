@@ -132,6 +132,7 @@ void InternalCallbackScope::Close() {
     CHECK_EQ(env_->trigger_async_id(), 0);
   }
 
+  // coderzhu: 没有tick任务则不需要往下走，在插入tick任务的时候会设置这个为true，没有任务时变成false 
   if (!tick_info->has_tick_scheduled() && !tick_info->has_rejection_to_warn()) {
     return;
   }
@@ -141,12 +142,14 @@ void InternalCallbackScope::Close() {
 
   if (!env_->can_call_into_js()) return;
 
+  // coderzhu: 处理tick的函数 
   Local<Function> tick_callback = env_->tick_callback_function();
 
   // The tick is triggered before JS land calls SetTickCallback
   // to initializes the tick callback during bootstrap.
   CHECK(!tick_callback.IsEmpty());
 
+  // coderzhu: 处理tick任务  
   if (tick_callback->Call(env_->context(), process, 0, nullptr).IsEmpty()) {
     failed_ = true;
   }

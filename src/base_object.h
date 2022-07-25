@@ -173,6 +173,7 @@ class BaseObject : public MemoryRetainer {
   template <typename T, bool kIsWeak>
   friend class BaseObjectPtrImpl;
 
+  // coderzhu: 指向封装的对象 
   v8::Global<v8::Object> persistent_handle_;
 
   // Metadata that is associated with this BaseObject if there are BaseObjectPtr
@@ -214,6 +215,7 @@ inline T* Unwrap(v8::Local<v8::Value> obj) {
   return BaseObject::FromJSObject<T>(obj);
 }
 
+// coderzhu: 从obj中获取对应的BaseObject对象，如果为空则返回第三个参数的值（默认值）
 #define ASSIGN_OR_RETURN_UNWRAP(ptr, obj, ...)                                 \
   do {                                                                         \
     *ptr = static_cast<typename std::remove_reference<decltype(*ptr)>::type>(  \

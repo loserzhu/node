@@ -55,6 +55,7 @@ class Environment;
 
 class HandleWrap : public AsyncWrap {
  public:
+  // coderzhu: 操作和判断handle状态函数，见libuv
   static void Close(const v8::FunctionCallbackInfo<v8::Value>& args);
   static void Ref(const v8::FunctionCallbackInfo<v8::Value>& args);
   static void Unref(const v8::FunctionCallbackInfo<v8::Value>& args);
@@ -70,8 +71,10 @@ class HandleWrap : public AsyncWrap {
     return IsAlive(wrap) && uv_has_ref(wrap->GetHandle());
   }
 
+  // coderzhu: 获取封装的handle
   inline uv_handle_t* GetHandle() const { return handle_; }
 
+  // coderzhu: 关闭handle，关闭成功后执行回调  
   virtual void Close(
       v8::Local<v8::Value> close_callback = v8::Local<v8::Value>());
 
@@ -90,6 +93,7 @@ class HandleWrap : public AsyncWrap {
   void MarkAsInitialized();
   void MarkAsUninitialized();
 
+  //coderzhu: handle状态
   inline bool IsHandleClosing() const {
     return state_ == kClosing || state_ == kClosed;
   }
@@ -105,6 +109,7 @@ class HandleWrap : public AsyncWrap {
   // position of members in memory are predictable. For more information please
   // refer to `doc/guides/node-postmortem-support.md`
   friend int GenDebugSymbols();
+  //coderzhu: handle队列 
   ListNode<HandleWrap> handle_wrap_queue_;
   enum { kInitialized, kClosing, kClosed } state_;
   uv_handle_t* const handle_;

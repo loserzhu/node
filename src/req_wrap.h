@@ -23,7 +23,7 @@ class ReqWrapBase {
  private:
   friend int GenDebugSymbols();
   friend class Environment;
-
+  // coderzhu: 一个带前后指针的节点
   ListNode<ReqWrapBase> req_wrap_queue_;
 };
 

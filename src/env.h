@@ -775,6 +775,14 @@ class TickInfo : public MemoryRetainer {
   friend class Environment;  // So we can call the constructor.
   inline explicit TickInfo(v8::Isolate* isolate);
 
+  /**
+   * @brief coderzhu: 
+   * TickInfo主要是有两个标记位, kHasTickScheduled 标记是否有tick任务需要处理,
+   * 然后通过InternalCallbackScope类的对象方法Close函数执行tick_callback_function,
+   * 当Nodejs底层需要执行一个js回调时，会调用AsyncWrap的MakeCallback,
+   * MakeCallback里面调用了InternalMakeCallback
+   * 
+   */
   enum Fields { kHasTickScheduled = 0, kHasRejectionToWarn, kFieldsCount };
 
   AliasedUint8Array fields_;

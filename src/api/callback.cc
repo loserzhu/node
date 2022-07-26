@@ -208,6 +208,7 @@ MaybeLocal<Value> InternalMakeCallback(Environment* env,
     return MaybeLocal<Value>();
   }
 
+// coderzhu: 执行用户层js回调
   scope.Close();
   if (scope.Failed()) {
     return MaybeLocal<Value>();

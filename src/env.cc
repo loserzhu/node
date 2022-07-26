@@ -511,11 +511,16 @@ Environment::~Environment() {
   CHECK_EQ(base_object_count_, 0);
 }
 
+/**
+ * @brief coderzhu: 
+ * 在Node.js初始化的时候，同时初始化了 immediate timer任务相关的数据结构和逻辑
+ */
 void Environment::InitializeLibuv() {
   HandleScope handle_scope(isolate());
   Context::Scope context_scope(context());
 
   CHECK_EQ(0, uv_timer_init(event_loop(), timer_handle()));
+  // coderzhu: 修改状态为unref，避免没有任务的时候，影响事件循环的退出
   uv_unref(reinterpret_cast<uv_handle_t*>(timer_handle()));
 
   uv_check_init(event_loop(), immediate_check_handle());
@@ -903,10 +908,12 @@ void Environment::CheckImmediate(uv_check_t* handle) {
 
   env->RunAndClearNativeImmediates();
 
+  // coderzhu: 没有Immediate节点需要处理 
   if (env->immediate_info()->count() == 0 || !env->can_call_into_js())
     return;
 
   do {
+    // coderzhu: 执行JS层回调immediate_callback_function
     MakeCallback(env->isolate(),
                  env->process_object(),
                  env->immediate_callback_function(),
@@ -915,6 +922,8 @@ void Environment::CheckImmediate(uv_check_t* handle) {
                  {0, 0}).ToLocalChecked();
   } while (env->immediate_info()->has_outstanding() && env->can_call_into_js());
 
+  // coderzhu: 所有immediate节点都处理完了，置idle阶段对应节点为非激活状态
+  // 允许Poll IO阶段阻塞和事件循环退出
   if (env->immediate_info()->ref_count() == 0)
     env->ToggleImmediateRef(false);
 }
